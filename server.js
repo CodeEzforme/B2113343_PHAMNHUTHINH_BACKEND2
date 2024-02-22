@@ -1,8 +1,21 @@
 const app = require('./app')
 const config = require('./app/config')
+const MongoDB = require('./app/utils/mongodb.until')
 
-const PORT = config.app.port
+const startServer = async () => {
+    try {
+        await MongoDB.connect(config.db.uri)
+        console.log('Connected to database(MongoDB)!')
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`)
-})
+        const PORT = config.app.port
+        app.listen(PORT, () => {
+            console.log('Server is running on port ${PORT}')
+        })
+    }
+    catch (err) {
+        console.log('Cannot connect to database(MongoDB)!', err)
+        process.exit()
+    }
+}
+
+startServer()
