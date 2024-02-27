@@ -62,6 +62,12 @@ class ContactService {
 
         return result
     }
+
+    async delete(id) {
+        return await this.Contact.findOneAndDelete({
+            _id: ObjectId.isValid(id) ? new ObjectId(id) : null
+        })
+    }
 }
 
 
