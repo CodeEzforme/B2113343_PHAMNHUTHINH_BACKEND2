@@ -103,16 +103,29 @@ module.exports.delete = async (req, res, next) => {
     }
 }
 
-module.exports.deleteAll = (req, res) => {
-    res.send({message: 'deleteAll handler'})
-}
+
 
 module.exports.findAllFavorite = async (req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client)
         const documents = await contactService.findFavorite()
-        console.log(documents)
         res.send(documents)
+    }
+    catch (err) {
+        return next (
+            new ApiError(500, "An error occurred while retrieving the contacts")
+        )
+    }
+}
+
+module.exports.deleteAll = async (req, res, next) => {
+    try {
+        const contactService = new ContactService(MongoDB.client)
+        const deletedCount = await contactService.deleteAll()
+
+        res.send({
+            message: `${deletedCount} contacts were deleted successfully`
+        })
     }
     catch (err) {
         return next (
