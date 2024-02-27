@@ -19,12 +19,44 @@ module.exports.create = async (req, res, next) => {
     }
 }
 
-module.exports.findAll = (req, res) => {
-    res.send({message: 'find all handler'})
+module.exports.findAll = async (req, res, next) => {
+    let documents = []
+
+    try {
+        const contactService = new ContactService(MongoDB.client)
+        const { name } = req.query
+
+        if(name) {
+            documents = await contactService.findByName(name)
+        }
+        else {
+            documents = await contactService.find({})
+        }
+    }
+    catch (err) {
+        return next (
+            new ApiError(500, "An error occurred while retrieving the contacts")
+        )
+    }
+    return res.send(documents)
 }
 
-module.exports.findOne = (req, res) => {
-    res.send({message: 'find one handler'})
+module.exports.findOne = async (req, res, next) => {
+    try {
+        const contactService = new ContactService(MongoDB.client)
+        const document = await contactService.findById(req.params.id)
+        if(!document) {
+            return next(
+                new ApiError(404, "Contact not found!")
+            )
+        }
+        return res.send(document)
+    }
+    catch (err) {
+        return next (
+            new ApiError(500, `Errorr etrieving contact with id: ${req.params.id}`)
+        )
+    }
 }
 
 module.exports.update = (req, res) => {
